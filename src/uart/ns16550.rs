@@ -1,34 +1,36 @@
 use super::ty::UART;
-const RBR: u32 = 0x00;
-const THR: u32 = 0x00;
-const DLL: u32 = 0x00;
-const DLH: u32 = 0x04;
-const IER: u32 = 0x04;
-const IIR: u32 = 0x08;
-const FCR: u32 = 0x08;
-const LCR: u32 = 0x0C;
-const MCR: u32 = 0x10;
-const LSR: u32 = 0x14;
-const MSR: u32 = 0x18;
-const LPDLL: u32 = 0x20;
-const LPDLH: u32 = 0x24;
-const FAR: u32 = 0x70;
-const TFR: u32 = 0x74;
-const RFW: u32 = 0x78;
-const USR: u32 = 0x7C;
-const TFL: u32 = 0x80;
-const SRR : u32 = 0x88;
-const SRTS : u32 = 0x8C;
-const SBCR: u32 = 0x90;
-const SDMAM: u32 = 0x94;
-const SFE: u32 = 0x98;
-const SRT : u32 = 0x9C;
-const STET : u32 = 0xA0;
-const HTX : u32 = 0xA4;
-const DMASA : u32 = 0xA8;
-const CPR : u32 = 0xF4;
-const UCV : u32 = 0xF8;
-const CTR: u32 = 0xFC;
+const RBR: isize = 0x00;
+const THR: isize = 0x00;
+const DLL: isize = 0x00;
+const DLH: isize = 0x04;
+const IER: isize = 0x04;
+const IIR: isize = 0x08;
+const FCR: isize = 0x08;
+const LCR: isize = 0x0C;
+const MCR: isize = 0x10;
+const LSR: isize = 0x14;
+const MSR: isize = 0x18;
+const LPDLL: isize = 0x20;
+const LPDLH: isize = 0x24;
+const FAR: isize = 0x70;
+const TFR: isize = 0x74;
+const RFW: isize = 0x78;
+const USR: isize = 0x7C;
+const TFL: isize = 0x80;
+const SRR : isize = 0x88;
+const SRTS : isize = 0x8C;
+const SBCR: isize = 0x90;
+const SDMAM: isize = 0x94;
+const SFE: isize = 0x98;
+const SRT : isize = 0x9C;
+const STET : isize = 0xA0;
+const HTX : isize = 0xA4;
+const DMASA : isize = 0xA8;
+const CPR : isize = 0xF4;
+const UCV : isize = 0xF8;
+const CTR: isize = 0xFC;
+
+
 
 pub struct NS16550 {
     base_addr: *mut u8
@@ -51,6 +53,21 @@ impl UART for NS16550 {
     }
 
     fn put(&mut self, ch: char) {
+        unsafe {
+
+
+            loop {
+                // line status register
+                let lsr = self.base_addr.offset(LSR).read_volatile();
+                // obtain transit holder register empty bit
+                let thre = (lsr >> 5) & 1;
+                // bit enabled  meaning the transmit holder register is empty
+                if thre == 1 {
+                    break;
+                }
+            } 
+            self.base_addr.offset(THR).write_volatile(ch as u8); 
+        }
 
     }
 }
