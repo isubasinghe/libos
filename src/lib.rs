@@ -1,3 +1,3 @@
 #![no_std]
-mod sdhc;
-mod uart;
+pub mod sdhc;
+pub mod uart;
